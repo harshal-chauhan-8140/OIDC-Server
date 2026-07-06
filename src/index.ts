@@ -1,10 +1,11 @@
 function hello(name: string, _age: number): void {
-  
-    console.log('my name is ', name);
-  
-    if (name == 'harshal') {
-      console.log('Welcome');
-    }
+  const unused = 'test';
+
+  console.log('my name is ', name);
+
+  if (name == 'harshal') {
+    console.log('Welcome');
   }
-  
-  hello('harshal', 25);
+}
+
+hello('harshal', 25);

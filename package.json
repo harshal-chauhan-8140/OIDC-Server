@@ -13,7 +13,8 @@
     "format:check": "prettier . --check",
     "format:fix": "prettier . --write",
     "lint:check": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -21,6 +22,8 @@
     "@types/node": "^26.1.0",
     "eslint": "^10.6.0",
     "globals": "^17.7.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "nodemon": "^3.1.14",
     "prettier": "3.9.4",
     "ts-node": "^10.9.2",
@@ -29,5 +32,11 @@
   },
   "dependencies": {
     "express": "^5.2.1"
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "npm run lint:fix",
+      "npm run format:fix"
+    ]
   }
 }
