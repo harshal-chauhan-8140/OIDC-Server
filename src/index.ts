@@ -1,5 +1,5 @@
 function hello(name: string): void {
-    console.log("my name is ", name)
+  console.log('my name is ', name);
 }
 
-hello("harshal")
+hello('harshal');
