@@ -1,0 +1,42 @@
+import winston from 'winston';
+import { config } from './index.js';
+
+const logger = winston.createLogger({
+  level: 'info',
+  defaultMeta: { service: config.SERVICE_NAME, env: config.NODE_ENV as string },
+  transports: [
+    new winston.transports.File({
+      level: 'error',
+      dirname: 'logs',
+      filename: 'error.log',
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple(),
+        winston.format.timestamp(),
+      ),
+      silent: config.NODE_ENV === 'test',
+    }),
+    new winston.transports.File({
+      level: 'info',
+      dirname: 'logs',
+      filename: 'combined.log',
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple(),
+        winston.format.timestamp(),
+      ),
+      silent: config.NODE_ENV === 'test',
+    }),
+    new winston.transports.Console({
+      level: 'info',
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple(),
+        winston.format.timestamp(),
+      ),
+      silent: config.NODE_ENV === 'test',
+    }),
+  ],
+});
+
+export default logger;

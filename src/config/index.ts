@@ -20,4 +20,5 @@ function requireEnv(key: string): string {
 export const config = {
   PORT: requireEnv('PORT'),
   NODE_ENV: requireEnv('NODE_ENV'),
+  SERVICE_NAME: requireEnv('SERVICE_NAME'),
 };
