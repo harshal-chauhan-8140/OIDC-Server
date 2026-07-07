@@ -5,7 +5,7 @@
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "build": "tsc",
     "dev": "cross-env NODE_ENV=dev nodemon --watch src --ext ts --exec \"node --loader ts-node/esm\" src/server.ts",
@@ -14,20 +14,26 @@
     "format:fix": "prettier . --write",
     "lint:check": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix --max-warnings=0",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@jest/globals": "^30.4.1",
     "@types/express": "^5.0.6",
     "@types/http-errors": "^2.0.5",
+    "@types/jest": "^30.0.0",
     "@types/node": "^26.1.0",
+    "@types/supertest": "^7.2.0",
     "cross-env": "^10.1.0",
     "eslint": "^10.6.0",
     "globals": "^17.7.0",
     "husky": "^9.1.7",
+    "jest": "^30.4.2",
     "lint-staged": "^17.0.8",
     "nodemon": "^3.1.14",
     "prettier": "3.9.4",
+    "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.1"
@@ -36,6 +42,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "http-errors": "^2.0.1",
+    "supertest": "^7.2.2",
     "winston": "^3.19.0"
   },
   "lint-staged": {
