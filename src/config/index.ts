@@ -21,4 +21,9 @@ export const config = {
   PORT: requireEnv('PORT'),
   NODE_ENV: requireEnv('NODE_ENV'),
   SERVICE_NAME: requireEnv('SERVICE_NAME'),
+  DB_HOST: requireEnv('DB_HOST'),
+  DB_PORT: requireEnv('DB_PORT'),
+  DB_NAME: requireEnv('DB_NAME'),
+  DB_USERNAME: requireEnv('DB_USERNAME'),
+  DB_PASSWORD: requireEnv('DB_PASSWORD'),
 };

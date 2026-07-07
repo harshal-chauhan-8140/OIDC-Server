@@ -1,6 +1,7 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
-import logger from './config/logger.js';
+import logger from './config/logger';
 import { HttpError } from 'http-errors';
+import 'reflect-metadata';
 
 const app = express();
 
