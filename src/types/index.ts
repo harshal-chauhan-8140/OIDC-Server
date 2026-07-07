@@ -8,3 +8,13 @@ export interface ClientRegisterData {
 export interface ClientRegisterRequest extends Request {
   body: ClientRegisterData;
 }
+
+export interface UserRegisterData {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface UserRegisterRequest extends Request {
+  body: UserRegisterData;
+}
