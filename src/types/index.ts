@@ -11,6 +11,7 @@ export interface AuthorizeQueryData {
   redirect_URI: string;
   scope: string;
   state?: string;
+  nonce?: string;
 }
 
 export interface ClientRegisterRequest extends Request {
@@ -36,3 +37,26 @@ export type UserRegisterRequest = Request<
   UserRegisterData,
   Partial<AuthorizeQueryData>
 >;
+
+export interface UserScopeData {
+  email?: string;
+  name?: string;
+}
+
+export interface UserInfoClaims {
+  sub: string;
+  email?: string;
+  name?: string;
+}
+
+export interface TokenVerificationData {
+  grantType: string;
+  clientId: string;
+  clientSecret: string;
+  code: string;
+  redirectURI: string;
+}
+
+export interface TokenVerficationRequest extends Request {
+  body: TokenVerificationData;
+}

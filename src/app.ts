@@ -5,6 +5,7 @@ import 'reflect-metadata';
 import clientRouter from './routes/clientRouter';
 import userRouter from './routes/userRouter';
 import authorizeRouter from './routes/AuthorizeRouter';
+import oidcRouter from './routes/oidcRouter';
 import session from 'express-session';
 import { config } from './config';
 import constants from './utils/constants';
@@ -35,6 +36,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/client', clientRouter);
 app.use('/auth', userRouter);
 app.use('/authorize', authorizeRouter);
+app.use(oidcRouter);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {

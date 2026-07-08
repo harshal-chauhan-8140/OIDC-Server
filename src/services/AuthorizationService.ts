@@ -4,9 +4,11 @@ import type { Logger } from 'winston';
 import type { User } from '../entities/User';
 import type { Client } from '../entities/Client';
 import createHttpError from 'http-errors';
-import type { ScopeSupported } from '../utils/constants';
+import { ScopeSupported } from '../utils/constants';
 import crypto from 'crypto';
 import constants from '../utils/constants';
+import type { UserScopeData } from '../types';
+import { generateIdToken, generateAccessToken } from '../utils/jwtHelper';
 
 export default class AuthorizationService {
   constructor(
@@ -23,6 +25,7 @@ export default class AuthorizationService {
     redirectURI: string,
     scope: string,
     state?: string,
+    nonce?: string,
   ) {
     const client: Client | null = await this.clientRepository.findOne({
       where: { clientId: clientId },
@@ -64,6 +67,11 @@ export default class AuthorizationService {
       throw customError;
     }
 
+    if (!scopeArray.includes(ScopeSupported.OPENID)) {
+      const customError = createHttpError(400, `openid scope is required`);
+      throw customError;
+    }
+
     const code = crypto.randomBytes(64).toString('hex');
 
     await this.authorizationRepository.save({
@@ -73,9 +81,99 @@ export default class AuthorizationService {
       redirectURI: redirectURI,
       scope: scopeArray,
       ...(state !== undefined ? { state } : {}),
+      ...(nonce !== undefined ? { nonce } : {}),
       expiresAt: new Date(Date.now() + constants.AUTHORIZATION_CODE_EXPIRES_MINUTE * 60 * 1000),
     });
 
     return code;
+  }
+
+  async tokenVerify(
+    grantType: string,
+    code: string,
+    redirectURI: string,
+    clientId: string,
+    clientSecret: string,
+  ) {
+    if (!code || !clientId) {
+      const customError = createHttpError(
+        400,
+        `${!code ? 'authorization code' : 'client id'} is missing.`,
+      );
+      throw customError;
+    }
+
+    const client = await this.clientRepository.findOne({
+      where: { clientId: clientId },
+    });
+
+    if (!client) {
+      const customError = createHttpError(400, `client does not exist with given client id.`);
+      throw customError;
+    }
+
+    if (clientSecret !== client.clientSecret) {
+      const customError = createHttpError(400, `client id or client secret is incorrect`);
+      throw customError;
+    }
+
+    if (client.grantTypeSupported !== grantType) {
+      const customError = createHttpError(400, `grant type not allowed.`);
+      throw customError;
+    }
+
+    const authorization = await this.authorizationRepository.findOne({
+      where: {
+        code: code,
+        client: { clientId: client.clientId },
+      },
+      relations: { user: true },
+    });
+
+    if (!authorization) {
+      const customError = createHttpError(400, `authorization code does not exist`);
+      throw customError;
+    }
+
+    if (authorization.redirectURI !== redirectURI) {
+      const customError = createHttpError(400, `redirect uri does not match`);
+      throw customError;
+    }
+
+    if (authorization.used) {
+      const customError = createHttpError(400, `authorization code already used`);
+      throw customError;
+    }
+
+    if (authorization.expiresAt.getTime() < Date.now()) {
+      const customError = createHttpError(400, `authorization code already expired.`);
+      throw customError;
+    }
+
+    const userScopeData: UserScopeData = {};
+
+    if (authorization.scope.includes(ScopeSupported.EMAIL)) {
+      userScopeData.email = authorization.user.email;
+    }
+
+    if (authorization.scope.includes(ScopeSupported.PROFILE)) {
+      userScopeData.name = authorization.user.name;
+    }
+
+    const idToken = generateIdToken(
+      authorization.user.id,
+      clientId,
+      userScopeData,
+      authorization.nonce,
+    );
+    const accessToken = generateAccessToken(authorization.user.id, clientId, authorization.scope);
+
+    await this.authorizationRepository.update(authorization.id, { used: true });
+
+    return {
+      idToken,
+      accessToken,
+      expiresIn: constants.ACCESS_TOKEN_EXPIRES_SECONDS,
+    };
   }
 }

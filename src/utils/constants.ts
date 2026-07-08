@@ -2,6 +2,8 @@ const constants = {
   SALT_ROUNDS: 10,
   MAX_AGE_OF_COOKIE: 1000 * 60 * 60 * 24,
   AUTHORIZATION_CODE_EXPIRES_MINUTE: 15,
+  ID_TOKEN_EXPIRES_SECONDS: 3600,
+  ACCESS_TOKEN_EXPIRES_SECONDS: 3600,
 };
 
 export enum ResponseTypeSupported {

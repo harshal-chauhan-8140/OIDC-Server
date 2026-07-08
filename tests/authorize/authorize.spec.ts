@@ -177,5 +177,27 @@ describe('POST /authorize', () => {
       const authorizations = await connection.getRepository(Authorization).find();
       expect(authorizations).toHaveLength(0);
     });
+
+    it('should return 400 when the openid scope is not requested', async () => {
+      const agent = await authenticatedAgent();
+      await seedClient();
+
+      const response = await agent.post('/authorize').query({ ...validQuery, scope: 'email' });
+
+      expect(response.statusCode).toBe(400);
+    });
+
+    it('should also accept the authorize request over GET', async () => {
+      const agent = await authenticatedAgent();
+      await seedClient();
+
+      const response = await agent.get('/authorize').query(validQuery);
+
+      expect(response.statusCode).toBe(302);
+
+      const location = new URL(response.headers.location);
+      expect(`${location.origin}${location.pathname}`).toBe(clientData.redirectURIs[0]);
+      expect(location.searchParams.get('code')).toBeTruthy();
+    });
   });
 });

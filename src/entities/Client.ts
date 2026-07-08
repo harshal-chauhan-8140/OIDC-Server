@@ -3,13 +3,13 @@ import { GrantTypeSupported, ResponseTypeSupported, ScopeSupported } from '../ut
 
 @Entity()
 export class Client {
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string;
 
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'varchar' })
   clientId!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   clientSecret!: string;
 
   @Column('simple-array')

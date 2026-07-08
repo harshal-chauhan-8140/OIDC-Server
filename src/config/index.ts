@@ -27,4 +27,7 @@ export const config = {
   DB_USERNAME: requireEnv('DB_USERNAME'),
   DB_PASSWORD: requireEnv('DB_PASSWORD'),
   SESSION_SECRET: requireEnv('SESSION_SECRET'),
+  ID_TOKEN_ISSUER: requireEnv('ID_TOKEN_ISSUER'),
+  JWT_SECRET: requireEnv('JWT_SECRET'),
+  OIDC_PRIVATE_KEY: requireEnv('OIDC_PRIVATE_KEY'),
 };

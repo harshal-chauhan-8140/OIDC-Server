@@ -16,7 +16,7 @@ export class Authorization {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   code!: string;
 
   @ManyToOne(() => Client)
@@ -27,14 +27,17 @@ export class Authorization {
   @JoinColumn({ name: 'userId' })
   user!: User;
 
-  @Column()
+  @Column({ type: 'varchar' })
   redirectURI!: string;
 
   @Column('simple-array')
   scope!: ScopeSupported[];
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   state?: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  nonce?: string;
 
   @Column('timestamp')
   expiresAt!: Date;

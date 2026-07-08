@@ -20,6 +20,8 @@ const authorizationService = new AuthorizationService(
 );
 const authoziationController = new AuthorizationController(authorizationService, logger);
 
-router.post('/', authoziationController.authorizate.bind(authoziationController));
+router.get('/', authoziationController.authorization.bind(authoziationController));
+router.post('/', authoziationController.authorization.bind(authoziationController));
+router.post('/token', authoziationController.token.bind(authoziationController));
 
 export default router;
