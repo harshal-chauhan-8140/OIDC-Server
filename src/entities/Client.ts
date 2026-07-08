@@ -1,20 +1,12 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { GrantTypeSupported, ResponseTypeSupported, ScopeSupported } from '../utils/constants';
 
 @Entity()
 export class Client {
-  @PrimaryGeneratedColumn()
-  id!: number;
-
   @Column()
   name!: string;
 
-  @Column()
+  @PrimaryColumn()
   clientId!: string;
 
   @Column()
@@ -22,6 +14,26 @@ export class Client {
 
   @Column('simple-array')
   redirectURIs!: string[];
+
+  @Column({
+    type: 'enum',
+    enum: ResponseTypeSupported,
+    default: ResponseTypeSupported.CODE,
+  })
+  responseType!: ResponseTypeSupported;
+
+  @Column({
+    type: 'enum',
+    enum: GrantTypeSupported,
+    default: GrantTypeSupported.AUTHORIZATION_CODE,
+  })
+  grantTypeSupported!: GrantTypeSupported;
+
+  @Column({
+    type: 'simple-array',
+    default: [ScopeSupported.OPENID, ScopeSupported.EMAIL],
+  })
+  scopeSupported!: ScopeSupported[];
 
   @CreateDateColumn()
   createdAt!: Date;

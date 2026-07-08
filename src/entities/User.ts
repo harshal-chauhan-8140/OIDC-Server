@@ -25,6 +25,4 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt!: Date;
-
-  accessToken?: string;
 }

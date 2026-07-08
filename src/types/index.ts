@@ -5,9 +5,24 @@ export interface ClientRegisterData {
   redirectURIs: [string];
 }
 
+export interface AuthorizeQueryData {
+  client_id: string;
+  response_type: string;
+  redirect_URI: string;
+  scope: string;
+  state?: string;
+}
+
 export interface ClientRegisterRequest extends Request {
   body: ClientRegisterData;
 }
+
+export type AuthorizeRequest = Request<
+  Record<string, never>,
+  Record<string, never>,
+  Record<string, never>,
+  AuthorizeQueryData
+>;
 
 export interface UserRegisterData {
   name: string;
@@ -15,6 +30,9 @@ export interface UserRegisterData {
   password: string;
 }
 
-export interface UserRegisterRequest extends Request {
-  body: UserRegisterData;
-}
+export type UserRegisterRequest = Request<
+  Record<string, never>,
+  Record<string, never>,
+  UserRegisterData,
+  Partial<AuthorizeQueryData>
+>;

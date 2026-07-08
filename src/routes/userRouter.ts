@@ -12,5 +12,6 @@ const userService = new UserService(userRepository, logger);
 const userController = new UserController(userService, logger);
 
 router.post('/register', userController.register.bind(userController));
+router.post('/login', userController.login.bind(userController));
 
 export default router;

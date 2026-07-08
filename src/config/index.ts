@@ -26,5 +26,5 @@ export const config = {
   DB_NAME: requireEnv('DB_NAME'),
   DB_USERNAME: requireEnv('DB_USERNAME'),
   DB_PASSWORD: requireEnv('DB_PASSWORD'),
-  JWT_SECRET: requireEnv('JWT_SECRET'),
+  SESSION_SECRET: requireEnv('SESSION_SECRET'),
 };

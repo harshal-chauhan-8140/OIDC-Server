@@ -4,8 +4,6 @@ import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entities/User';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { config } from '../../src/config';
 
 describe('POST /auth/register', () => {
   let connection: DataSource;
@@ -74,29 +72,28 @@ describe('POST /auth/register', () => {
     expect(isPasswordHashed).toBe(true);
   });
 
-  it('should return a JWT access token', async () => {
-    const response = await registerUser();
-
-    expect(response.body).toHaveProperty('accessToken');
-    expect(typeof response.body.accessToken).toBe('string');
-  });
-
-  it('should issue a valid JWT that belongs to the registered user', async () => {
-    const response = await registerUser();
-
-    const users = await getSavedUsers();
-
-    const decoded = jwt.verify(response.body.accessToken, config.JWT_SECRET) as {
-      sub?: string;
-    };
-
-    expect(decoded.sub).toBe(String(users[0].id));
-  });
-
   it('should not return the password in the response', async () => {
     const response = await registerUser();
 
     expect(response.body).not.toHaveProperty('password');
+  });
+
+  it('should start a stateful session by setting a session cookie', async () => {
+    const response = await registerUser();
+
+    const cookies = (response.headers['set-cookie'] ?? []) as unknown as string[];
+
+    expect(cookies.some((cookie) => cookie.startsWith('connect.sid='))).toBe(true);
+  });
+
+  it('should set the session cookie as HttpOnly', async () => {
+    const response = await registerUser();
+
+    const cookies = (response.headers['set-cookie'] ?? []) as unknown as string[];
+    const sessionCookie = cookies.find((cookie) => cookie.startsWith('connect.sid='));
+
+    expect(sessionCookie).toBeDefined();
+    expect(sessionCookie).toEqual(expect.stringContaining('HttpOnly'));
   });
 
   it('should return 400 when the email is already registered', async () => {
@@ -104,5 +101,41 @@ describe('POST /auth/register', () => {
     const response = await registerUser();
 
     expect(response.statusCode).toBe(400);
+  });
+
+  describe('when part of the authorize flow (query params present)', () => {
+    const authorizeQuery = {
+      client_id: 'test-client-id',
+      response_type: 'code',
+      redirect_URI: 'https://client.example.com/callback',
+      scope: 'openid email',
+      state: 'xyz-state-123',
+    };
+
+    it('should redirect to /authorize with the same query params after registering', async () => {
+      const response = await request(app)
+        .post('/auth/register')
+        .query(authorizeQuery)
+        .send(userRegisterData);
+
+      expect(response.statusCode).toBe(302);
+
+      const location = new URL(response.headers.location, 'http://localhost');
+      expect(location.pathname).toBe('/authorize');
+      expect(location.searchParams.get('client_id')).toBe(authorizeQuery.client_id);
+      expect(location.searchParams.get('response_type')).toBe(authorizeQuery.response_type);
+      expect(location.searchParams.get('redirect_URI')).toBe(authorizeQuery.redirect_URI);
+      expect(location.searchParams.get('scope')).toBe(authorizeQuery.scope);
+      expect(location.searchParams.get('state')).toBe(authorizeQuery.state);
+    });
+
+    it('should still persist the user when registering within the authorize flow', async () => {
+      await request(app).post('/auth/register').query(authorizeQuery).send(userRegisterData);
+
+      const users = await getSavedUsers();
+
+      expect(users).toHaveLength(1);
+      expect(users[0].email).toBe(userRegisterData.email);
+    });
   });
 });
